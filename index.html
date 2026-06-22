@@ -1,33 +1,35 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>Advanced Piano Music Maker - One Octave</title>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>Advanced Piano Music Maker - Shift Keys</title>
 <link rel="icon" href="TUMM2.png">
 <style>
 *{margin:0;padding:0;box-sizing:border-box;font-family:Arial,sans-serif}
 body{background:#f4f4f4;padding:15px;color:#222}
 .container{max-width:1000px;margin:auto}
-header{text-align:center;margin-bottom:20px}
-.logo{width:80px;height:80px;object-fit:cover;border-radius:12px;margin-bottom:10px}
-.banner{width:100%;max-height:120px;object-fit:contain;border-radius:8px;margin-bottom:15px}
-.controls{display:flex;flex-wrap:wrap;gap:10px;justify-content:center;margin-bottom:20px}
-button,select{padding:10px 14px;border:none;border-radius:8px;cursor:pointer;font-weight:bold}
+header{text-align:center;margin-bottom:14px}
+.logo{width:80px;height:80px;object-fit:cover;border-radius:12px;margin-bottom:8px}
+.banner{width:100%;max-height:120px;object-fit:contain;border-radius:8px;margin-bottom:12px}
+.controls{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;margin-bottom:12px}
+button,select{padding:8px 12px;border:none;border-radius:8px;cursor:pointer}
 .play-btn{background:#4caf50;color:white}
 .stop-btn{background:#f44336;color:white}
 .clear-btn{background:#2196f3;color:white}
-.control-box{background:white;padding:10px;border-radius:8px}
+.shift-btn{background:#607d8b;color:white}
+.control-box{background:white;padding:8px;border-radius:8px}
 .piano-wrap{display:flex;justify-content:center;margin-bottom:20px;position:relative;user-select:none}
 .white-keys{display:flex;gap:2px}
 .key{display:flex;justify-content:center;align-items:flex-end;padding-bottom:10px;border:1px solid #333;font-size:12px;font-weight:bold;cursor:pointer}
-.white{width:80px;height:240px;background:white;color:black;border-radius:6px 6px 6px 6px;position:relative;z-index:1}
+.white{width:80px;height:240px;background:white;color:black;border-radius:6px;position:relative;z-index:1}
 .black{width:52px;height:150px;background:black;color:white;position:absolute;z-index:2;border-radius:4px;box-shadow:0 4px 6px rgba(0,0,0,0.4)}
 .key-label{font-size:12px;margin-bottom:8px;opacity:0.9}
 .key.active{transform:translateY(4px);opacity:0.85}
 .black.active{transform:translateY(6px)}
 .keys-row{position:relative;padding:0 10px}
 .info{text-align:center;margin-top:10px;font-size:14px}
+.small{font-size:12px;color:#333}
 </style>
 </head>
 <body>
@@ -35,14 +37,17 @@ button,select{padding:10px 14px;border:none;border-radius:8px;cursor:pointer;fon
 <header>
 <img src="TUMM2.png" class="logo" alt="logo">
 <img src="TUMM2.png" class="banner" alt="banner">
-<h1>Advanced Piano Music Maker — One Octave</h1>
-<p>Use your computer keyboard to play notes. White keys: A S D F G H J. Black keys: W E T Y U.</p>
+<h1>Advanced Piano Music Maker — Shift Keys</h1>
+<p class="small">White keys: A S D F G H J. Black keys: W E T Y U.</p>
 </header>
 
 <div class="controls">
 <button id="playBtn" class="play-btn">▶ Play</button>
 <button id="stopBtn" class="stop-btn">■ Stop</button>
 <button id="clearBtn" class="clear-btn">Clear</button>
+
+<button id="shiftDown" class="shift-btn">Shift -10</button>
+<button id="shiftUp" class="shift-btn">Shift +10</button>
 
 <div class="control-box">
 Volume
@@ -62,229 +67,302 @@ Instrument
 
 <div class="piano-wrap">
   <div class="keys-row">
-    <div class="white-keys" id="whiteKeys">
-      <!-- white keys created by script -->
-    </div>
-    <!-- black keys are positioned absolutely over whites -->
-    <!-- black keys container -->
+    <div class="white-keys" id="whiteKeys"></div>
     <div id="blackKeysContainer"></div>
   </div>
 </div>
 
 <div class="info">
-Tip: press and hold a mapped computer key. The sound lasts 0.6s. Change instrument or volume above.
+Tip: Use Shift -10 to move keys down by 10 semitones. Press Shift +10 to move back up.
 </div>
 </div>
 
 <script>
-/*
- One octave only: C4 to B4 (white notes: C D E F G A B)
- White key mapping: A S D F G H J -> C4 D4 E4 F4 G4 A4 B4
- Black key mapping: W E  T Y U -> C#4 D#4  F#4 G#4 A#4
- The layout follows a real piano:
-  White order: C  D  E  F  G  A  B
-  Black positions: between C-D (C#), D-E (D#), *no black between E-F*, F-G (F#), G-A (G#), A-B (A#)
-*/
-
-// Notes array (one octave)
-const whiteNotes = ['C4','D4','E4','F4','G4','A4','B4'];
-const blackNotes = [
-  {note:'C#4', positionIndex:0, key:'w'},
-  {note:'D#4', positionIndex:1, key:'e'},
-  // skip between E-F (no black)
-  {note:'F#4', positionIndex:3, key:'t'},
-  {note:'G#4', positionIndex:4, key:'y'},
-  {note:'A#4', positionIndex:5, key:'u'}
+// One visual octave layout and mapping
+const whiteKeyNames = ['C','D','E','F','G','A','B']; // base names
+const whiteKeyMapKeys = ['a','s','d','f','g','h','j']; // computer keys
+const blackPositions = [
+  {name:'C#', index:0, key:'w'},
+  {name:'D#', index:1, key:'e'},
+  {name:'F#', index:3, key:'t'},
+  {name:'G#', index:4, key:'y'},
+  {name:'A#', index:5, key:'u'}
 ];
 
-// Keyboard mapping
-const keyMap = {
-  // white keys
-  'a':'C4','s':'D4','d':'E4','f':'F4','g':'G4','h':'A4','j':'B4',
-  // black keys
-  'w':'C#4','e':'D#4','t':'F#4','y':'G#4','u':'A#4'
-};
+// base octave number (we will display notes using baseOctave)
+let baseOctave = 4; // starting octave for visual C..B -> C4..B4
 
-const audioContext = (window.AudioContext || window.webkitAudioContext) ? new (window.AudioContext || window.webkitAudioContext)() : null;
+// Build full note name list and frequency map
+const noteNames = []; // e.g., C0..B8
+(function buildNoteNames(){
+  const names = ["C","C#","D","D#","E","F","F#","G","G#","A","A#","B"];
+  for(let o=0;o<=8;o++){
+    for(let i=0;i<12;i++){
+      noteNames.push(names[i]+o);
+    }
+  }
+})();
+
+// frequency map using A4 = 440
 const frequencies = {};
-// build frequencies map (simple calculation using A4 = 440)
 (function buildFreq(){
   const names = ["C","C#","D","D#","E","F","F#","G","G#","A","A#","B"];
   for(let octave=0; octave<=8; octave++){
     for(let i=0;i<12;i++){
-      const name = names[i] + octave;
       const index = octave*12 + i;
-      const a4Index = 4*12 + 9; // A4 is index
-      frequencies[name] = 440 * Math.pow(2, (index - a4Index)/12);
+      const a4Index = 4*12 + 9; // index of A4
+      frequencies[names[i]+octave] = 440 * Math.pow(2, (index - a4Index)/12);
     }
   }
 })();
 
-function createOsc(type,freq,gainNode){
+const audioContext = (window.AudioContext || window.webkitAudioContext) ? new (window.AudioContext || window.webkitAudioContext)() : null;
+
+function createOsc(type,freq,gain){
   const osc = audioContext.createOscillator();
   osc.type = type;
   osc.frequency.value = freq;
-  osc.connect(gainNode);
+  osc.connect(gain);
   osc.start();
   return osc;
 }
 
-function playSound(note, duration = 0.6){
+function playSound(noteName, duration=0.6){
   if(!audioContext) return;
   const instrument = document.getElementById('instrument').value;
-  const gainNode = audioContext.createGain();
-  const vol = document.getElementById('volume').value;
-  gainNode.gain.value = vol/100;
-  gainNode.connect(audioContext.destination);
+  const gain = audioContext.createGain();
+  gain.gain.value = document.getElementById('volume').value/100;
+  gain.connect(audioContext.destination);
 
-  const list = [];
-  const freq = frequencies[note] || 440;
-  if(instrument === 'piano'){
-    list.push(createOsc('sine', freq, gainNode));
-  } else if(instrument === 'electric'){
-    list.push(createOsc('triangle', freq, gainNode));
-  } else if(instrument === 'organ'){
-    list.push(createOsc('square', freq, gainNode));
-    list.push(createOsc('square', freq*2, gainNode));
-  } else if(instrument === 'strings'){
-    list.push(createOsc('sawtooth', freq, gainNode));
-    list.push(createOsc('triangle', freq/2, gainNode));
-  }
+  const list=[];
+  const freq = frequencies[noteName] || 440;
+  if(instrument==="piano"){ list.push(createOsc('sine',freq,gain)); }
+  if(instrument==="electric"){ list.push(createOsc('triangle',freq,gain)); }
+  if(instrument==="organ"){ list.push(createOsc('square',freq,gain)); list.push(createOsc('square',freq*2,gain)); }
+  if(instrument==="strings"){ list.push(createOsc('sawtooth',freq,gain)); list.push(createOsc('triangle',freq/2,gain)); }
 
-  // simple decay
-  gainNode.gain.exponentialRampToValueAtTime(0.0001, audioContext.currentTime + duration);
-
-  list.forEach(osc => osc.stop(audioContext.currentTime + duration));
+  gain.gain.exponentialRampToValueAtTime(0.0001, audioContext.currentTime + duration);
+  list.forEach(o=>o.stop(audioContext.currentTime + duration));
 }
 
-// Build visual keys
+// Helper: get index of note name in noteNames array
+function noteIndex(note){
+  return noteNames.indexOf(note);
+}
+
+// Given a root note like "C" and octave number, return full name "C4"
+function makeNoteName(name, octave){
+  return name + octave;
+}
+
+// Create visual keys
 const whiteKeysDiv = document.getElementById('whiteKeys');
 const blackKeysContainer = document.getElementById('blackKeysContainer');
-const whiteKeyElements = [];
-const blackKeyElements = [];
 
-whiteNotes.forEach((note, i) => {
-  const w = document.createElement('div');
-  w.className = 'key white';
-  w.dataset.note = note;
-  w.style.width = '80px';
-  w.style.height = '240px';
-  w.style.borderRadius = '6px';
-  // label
-  const label = document.createElement('div');
-  label.className = 'key-label';
-  label.textContent = note + ' (' + Object.keys(keyMap).find(k=>keyMap[k]===note)?.toUpperCase() + ')';
-  w.appendChild(label);
-  // click
-  w.addEventListener('mousedown', () => {
-    playSound(note, 0.6);
-    w.classList.add('active');
-    setTimeout(()=>w.classList.remove('active'), 200);
-  });
-  whiteKeysDiv.appendChild(w);
-  whiteKeyElements.push(w);
-});
+function renderKeys(){
+  whiteKeysDiv.innerHTML = '';
+  blackKeysContainer.innerHTML = '';
 
-// Position black keys absolutely over the white keys
-// Calculate left positions relative to white keys
-// Each white key is 80px wide + 2px gap (we used flex gap earlier). For simplicity use left offsets.
-(function placeBlackKeys(){
-  // container left offset is same as whiteKeysDiv start; we will compute positions using child bounding boxes
-  // After layout, use bounding boxes to place black keys
+  // Build white keys with labels and data-note
+  for(let i=0;i<whiteKeyNames.length;i++){
+    const name = whiteKeyNames[i];
+    const full = makeNoteName(name, baseOctave);
+    const keyDiv = document.createElement('div');
+    keyDiv.className = 'key white';
+    keyDiv.dataset.note = full;
+    keyDiv.style.width = '80px';
+    keyDiv.style.height = '240px';
+    const label = document.createElement('div');
+    label.className = 'key-label';
+    const mapped = whiteKeyMapKeys[i] ? whiteKeyMapKeys[i].toUpperCase() : '';
+    label.textContent = full + ' ('+ mapped +')';
+    keyDiv.appendChild(label);
+    keyDiv.addEventListener('mousedown', ()=>{
+      playSound(keyDiv.dataset.note, 0.6);
+      keyDiv.classList.add('active');
+      setTimeout(()=>keyDiv.classList.remove('active'),200);
+    });
+    whiteKeysDiv.appendChild(keyDiv);
+  }
+
+  // Position black keys
+  // Use bounding boxes after layout. Place black keys between white keys based on index.
   requestAnimationFrame(()=>{
-    const whites = whiteKeyElements.map(el => el.getBoundingClientRect());
+    const whites = Array.from(whiteKeysDiv.children);
     const parentRect = whiteKeysDiv.getBoundingClientRect();
-    blackNotes.forEach(b => {
-      // positionIndex refers to between white keys: 0 means between white[0] and white[1]
-      const idx = b.positionIndex;
-      // compute mid point between white key idx and idx+1
-      const leftWhite = whites[idx];
-      const rightWhite = whites[idx+1];
-      // some environments might not have rightWhite (be safe)
-      const mid = rightWhite ? ((leftWhite.left + rightWhite.left) / 2) : (leftWhite.left + leftWhite.width * 0.75);
-      // convert to container relative left
+
+    blackPositions.forEach(b=>{
+      const pos = b.index;
+      // compute mid between white[pos] and white[pos+1]
+      const leftWhite = whites[pos];
+      const rightWhite = whites[pos+1];
+      if(!leftWhite || !rightWhite) return;
+      const leftRect = leftWhite.getBoundingClientRect();
+      const rightRect = rightWhite.getBoundingClientRect();
+      const mid = (leftRect.left + rightRect.left) / 2;
       const left = mid - parentRect.left;
+      const noteFull = makeNoteName(b.name, baseOctave);
       const bk = document.createElement('div');
       bk.className = 'key black';
-      bk.dataset.note = b.note;
-      bk.style.left = (left - 26) + 'px'; // center black key (width 52)
+      bk.dataset.note = noteFull;
+      bk.style.left = (left - 26) + 'px';
       bk.style.top = '10px';
-      bk.textContent = b.note + ' (' + b.key.toUpperCase() + ')';
-      bk.style.display = 'flex';
-      bk.style.justifyContent = 'center';
-      bk.style.alignItems = 'flex-end';
-      bk.style.paddingBottom = '10px';
-      bk.style.fontSize = '11px';
-      bk.addEventListener('mousedown', () => {
-        playSound(b.note, 0.6);
+      bk.textContent = noteFull + ' ('+ b.key.toUpperCase() +')';
+      bk.style.display='flex';
+      bk.style.justifyContent='center';
+      bk.style.alignItems='flex-end';
+      bk.style.paddingBottom='10px';
+      bk.style.fontSize='11px';
+      bk.addEventListener('mousedown', ()=>{
+        playSound(bk.dataset.note, 0.6);
         bk.classList.add('active');
-        setTimeout(()=>bk.classList.remove('active'), 200);
+        setTimeout(()=>bk.classList.remove('active'),200);
       });
       blackKeysContainer.appendChild(bk);
-      blackKeyElements.push(bk);
     });
   });
-})();
+}
+
+// Initial render
+renderKeys();
+
+// Keyboard mapping (A S D F G H J and W E T Y U)
+const keyMap = {
+  'a': makeNoteName('C', baseOctave),
+  's': makeNoteName('D', baseOctave),
+  'd': makeNoteName('E', baseOctave),
+  'f': makeNoteName('F', baseOctave),
+  'g': makeNoteName('G', baseOctave),
+  'h': makeNoteName('A', baseOctave),
+  'j': makeNoteName('B', baseOctave),
+  'w': makeNoteName('C#', baseOctave),
+  'e': makeNoteName('D#', baseOctave),
+  't': makeNoteName('F#', baseOctave),
+  'y': makeNoteName('G#', baseOctave),
+  'u': makeNoteName('A#', baseOctave)
+};
+
+// We'll keep a dynamic mapping that updates when baseOctave changes
+let dynamicKeyMap = Object.assign({}, keyMap);
+
+// Update dynamicKeyMap after shift
+function updateDynamicKeyMap(){
+  dynamicKeyMap = {};
+  for(let i=0;i<whiteKeyNames.length;i++){
+    const k = whiteKeyMapKeys[i];
+    if(k) dynamicKeyMap[k] = makeNoteName(whiteKeyNames[i], baseOctave);
+  }
+  blackPositions.forEach(b=>{
+    dynamicKeyMap[b.key] = makeNoteName(b.name, baseOctave);
+  });
+}
+
+// call once
+updateDynamicKeyMap();
 
 // Keyboard input handling
 const keysDown = {};
-window.addEventListener('keydown', (ev) => {
+window.addEventListener('keydown', (ev)=>{
   const k = ev.key.toLowerCase();
-  if(!keyMap[k]) return;
-  if(keysDown[k]) return; // already pressed
+  if(!dynamicKeyMap[k]) return;
+  if(keysDown[k]) return;
   keysDown[k] = true;
-  const note = keyMap[k];
+  const note = dynamicKeyMap[k];
   playSound(note, 0.6);
-  // add visual active class to corresponding key element
-  const white = document.querySelector('.key.white[data-note="'+note+'"]');
-  const black = document.querySelector('.key.black[data-note="'+note+'"]');
-  if(white) white.classList.add('active');
-  if(black) black.classList.add('active');
+  const el = document.querySelector('.key[data-note="'+note+'"]');
+  if(el) el.classList.add('active');
 });
-window.addEventListener('keyup', (ev) => {
+window.addEventListener('keyup', (ev)=>{
   const k = ev.key.toLowerCase();
-  if(!keyMap[k]) return;
+  if(!dynamicKeyMap[k]) return;
   keysDown[k] = false;
-  const note = keyMap[k];
-  const white = document.querySelector('.key.white[data-note="'+note+'"]');
-  const black = document.querySelector('.key.black[data-note="'+note+'"]');
-  if(white) white.classList.remove('active');
-  if(black) black.classList.remove('active');
+  const note = dynamicKeyMap[k];
+  const el = document.querySelector('.key[data-note="'+note+'"]');
+  if(el) el.classList.remove('active');
 });
 
-// Prevent page scroll for space/arrow keys if used (safe)
-window.addEventListener('keydown', function(e){
-  if([' ','ArrowUp','ArrowDown','ArrowLeft','ArrowRight'].includes(e.key)){
-    e.preventDefault();
+// Shift functions: change baseOctave and also shift by semitones
+function shiftSemitones(semitones){
+  // Determine new mapping by shifting every visible key by semitones
+  // For each white name and black position, compute current absolute index, add semitones, then convert to name+octave.
+  function shiftName(name, octave, add){
+    const full = name + octave;
+    const idx = noteIndex(full);
+    if(idx === -1) return full;
+    const newIdx = idx + add;
+    if(newIdx < 0 || newIdx >= noteNames.length) return full; // out of range, ignore
+    return noteNames[newIdx];
   }
+
+  // adjust baseOctave indirectly by computing new base note for 'C' of this visual set
+  // current visual C is makeNoteName('C', baseOctave). Shift it by semitones to get new C note.
+  const currentC = makeNoteName('C', baseOctave);
+  const newC = shiftName('C', baseOctave, semitones);
+
+  // parse newC to name and octave
+  const match = newC.match(/^([A-G]#?)(\d)$/);
+  if(!match) return;
+  const newName = match[1];
+  const newOct = parseInt(match[2],10);
+
+  // We want visual whites to still be named C D E F G A B, so compute how many semitones newC is from an actual C of some octave.
+  // If newName is not 'C', we must set baseOctave so that makeNoteName('C', baseOctave) equals newC's nearest C below or equal.
+  // Simpler: compute absolute index of desired newC, then find the octave for C by dividing index by 12 and selecting remainder 0 (C).
+  const desiredIndex = noteIndex(newC);
+  if(desiredIndex === -1) return;
+  const octaveForC = Math.floor(desiredIndex / 12);
+  // set baseOctave to octaveForC, but ensure makeNoteName('C',baseOctave) equals the C at that octave.
+  baseOctave = octaveForC;
+
+  // After changing baseOctave, update dynamic map and re-render labels
+  updateDynamicKeyMap();
+  renderKeys();
+}
+
+// Buttons
+document.getElementById('shiftDown').addEventListener('click', ()=>{
+  shiftSemitones(-10);
+});
+document.getElementById('shiftUp').addEventListener('click', ()=>{
+  shiftSemitones(+10);
 });
 
-// Small play/stop behavior: play a simple scale as demo
+// Simple play demo (plays scale)
 let demoTimer = null;
 document.getElementById('playBtn').addEventListener('click', ()=>{
   clearInterval(demoTimer);
-  const order = ['C4','D4','E4','F4','G4','A4','B4','C4'];
-  let i = 0;
+  const order = [
+    makeNoteName('C', baseOctave),
+    makeNoteName('D', baseOctave),
+    makeNoteName('E', baseOctave),
+    makeNoteName('F', baseOctave),
+    makeNoteName('G', baseOctave),
+    makeNoteName('A', baseOctave),
+    makeNoteName('B', baseOctave),
+    makeNoteName('C', baseOctave+1)
+  ];
+  let i=0;
   demoTimer = setInterval(()=>{
-    playSound(order[i%order.length], 0.5);
-    // visual flash
-    const el = document.querySelector('.key[data-note="'+order[i%order.length]+'"]');
-    if(el){
-      el.classList.add('active');
-      setTimeout(()=>el.classList.remove('active'),200);
-    }
+    const n = order[i % order.length];
+    playSound(n, 0.5);
+    const el = document.querySelector('.key[data-note="'+n+'"]');
+    if(el){ el.classList.add('active'); setTimeout(()=>el.classList.remove('active'),200); }
     i++;
   }, 400);
 });
 document.getElementById('stopBtn').addEventListener('click', ()=>{
   clearInterval(demoTimer);
-  demoTimer = null;
+  demoTimer=null;
 });
 document.getElementById('clearBtn').addEventListener('click', ()=>{
-  // no sequencer here; just stop demo
   clearInterval(demoTimer);
-  demoTimer = null;
+  demoTimer=null;
 });
+
+// helper: find index of note in noteNames
+function noteIndex(note){
+  return noteNames.indexOf(note);
+}
 </script>
 </body>
 </html>
