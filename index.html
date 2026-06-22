@@ -1,226 +1,52 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Advanced Piano Music Maker</title>
-
-<link rel="icon" href="mainlogo.jpg">
-
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Advanced Piano Music Maker - One Octave</title>
+<link rel="icon" href="TUMM2.png">
 <style>
-*{
-    margin:0;
-    padding:0;
-    box-sizing:border-box;
-    font-family:Arial,sans-serif;
-}
-
-body{
-    background:#f4f4f4;
-    padding:15px;
-    color:#222;
-}
-
-.container{
-    max-width:1700px;
-    margin:auto;
-}
-
-header{
-    text-align:center;
-    margin-bottom:20px;
-}
-
-.logo{
-    width:80px;
-    height:80px;
-    object-fit:cover;
-    border-radius:12px;
-    margin-bottom:10px;
-}
-
-.banner{
-    width:100%;
-    max-height:180px;
-    object-fit:cover;
-    border-radius:12px;
-    margin-bottom:15px;
-}
-
-.controls{
-    display:flex;
-    flex-wrap:wrap;
-    gap:10px;
-    justify-content:center;
-    margin-bottom:20px;
-}
-
-button,select{
-    padding:10px 14px;
-    border:none;
-    border-radius:8px;
-    cursor:pointer;
-    font-weight:bold;
-}
-
-.play-btn{background:#4caf50;color:white;}
-.stop-btn{background:#f44336;color:white;}
-.clear-btn{background:#2196f3;color:white;}
-.save-btn{background:#9c27b0;color:white;}
-.load-btn{background:#ff9800;color:white;}
-
-.control-box{
-    background:white;
-    padding:10px;
-    border-radius:8px;
-}
-
-#piano{
-    display:flex;
-    flex-wrap:wrap;
-    justify-content:center;
-    gap:2px;
-    margin-bottom:20px;
-}
-
-.key{
-    width:58px;
-    height:170px;
-    display:flex;
-    justify-content:center;
-    align-items:flex-end;
-    padding-bottom:10px;
-    cursor:pointer;
-    border:1px solid #333;
-    font-size:12px;
-    font-weight:bold;
-    user-select:none;
-    position:relative;
-}
-
-.white{
-    background:white;
-    color:black;
-    z-index:1;
-}
-
-.black{
-    background:black;
-    color:white;
-    width:40px;
-    height:110px;
-    margin-left:-20px;
-    margin-right:-20px;
-    z-index:2;
-    box-shadow:0 4px 6px rgba(0,0,0,0.4);
-}
-
-.key.active{
-    transform:translateY(4px);
-    opacity:0.85;
-}
-
-#sequencerWrapper{
-    overflow:auto;
-    background:white;
-    padding:10px;
-    border-radius:12px;
-}
-
-#sequencer{
-    display:grid;
-    gap:1px;
-}
-
-.noteLabel{
-    width:90px;
-    height:30px;
-    background:#ececec;
-    display:flex;
-    justify-content:center;
-    align-items:center;
-    font-size:12px;
-    font-weight:bold;
-    position:sticky;
-    left:0;
-    z-index:3;
-}
-
-.cell{
-    width:28px;
-    height:30px;
-    background:white;
-    border:1px solid #ddd;
-    cursor:pointer;
-}
-
-.measure{
-    border-right:3px solid #666 !important;
-}
-
-.noteStart{
-    background:#ffeb3b;
-}
-
-.noteBody{
-    background:#ffd54f;
-}
-
-.playhead{
-    outline:3px solid #ff5722;
-}
-
-.info{
-    margin-top:15px;
-    text-align:center;
-    font-size:14px;
-    line-height:1.6;
-}
-
-input[type=range]{
-    width:120px;
-}
-
-input[type=number]{
-    width:80px;
-    padding:5px;
-}
+*{margin:0;padding:0;box-sizing:border-box;font-family:Arial,sans-serif}
+body{background:#f4f4f4;padding:15px;color:#222}
+.container{max-width:1000px;margin:auto}
+header{text-align:center;margin-bottom:20px}
+.logo{width:80px;height:80px;object-fit:cover;border-radius:12px;margin-bottom:10px}
+.banner{width:100%;max-height:120px;object-fit:contain;border-radius:8px;margin-bottom:15px}
+.controls{display:flex;flex-wrap:wrap;gap:10px;justify-content:center;margin-bottom:20px}
+button,select{padding:10px 14px;border:none;border-radius:8px;cursor:pointer;font-weight:bold}
+.play-btn{background:#4caf50;color:white}
+.stop-btn{background:#f44336;color:white}
+.clear-btn{background:#2196f3;color:white}
+.control-box{background:white;padding:10px;border-radius:8px}
+.piano-wrap{display:flex;justify-content:center;margin-bottom:20px;position:relative;user-select:none}
+.white-keys{display:flex;gap:2px}
+.key{display:flex;justify-content:center;align-items:flex-end;padding-bottom:10px;border:1px solid #333;font-size:12px;font-weight:bold;cursor:pointer}
+.white{width:80px;height:240px;background:white;color:black;border-radius:6px 6px 6px 6px;position:relative;z-index:1}
+.black{width:52px;height:150px;background:black;color:white;position:absolute;z-index:2;border-radius:4px;box-shadow:0 4px 6px rgba(0,0,0,0.4)}
+.key-label{font-size:12px;margin-bottom:8px;opacity:0.9}
+.key.active{transform:translateY(4px);opacity:0.85}
+.black.active{transform:translateY(6px)}
+.keys-row{position:relative;padding:0 10px}
+.info{text-align:center;margin-top:10px;font-size:14px}
 </style>
 </head>
 <body>
-
 <div class="container">
-
 <header>
-<img src="mainlogo.jpg" class="logo">
-<img src="sublogo.jpg" class="banner">
-
-<h1>Advanced Piano Music Maker</h1>
-
-<p>
-Click a cell to create a note.<br>
-Click and drag right to make the note longer.<br>
-Use your computer keyboard to play keys.
-</p>
-
+<img src="TUMM2.png" class="logo" alt="logo">
+<img src="TUMM2.png" class="banner" alt="banner">
+<h1>Advanced Piano Music Maker — One Octave</h1>
+<p>Use your computer keyboard to play notes. White keys: A S D F G H J. Black keys: W E T Y U.</p>
 </header>
 
 <div class="controls">
-
 <button id="playBtn" class="play-btn">▶ Play</button>
 <button id="stopBtn" class="stop-btn">■ Stop</button>
 <button id="clearBtn" class="clear-btn">Clear</button>
-<button id="saveBtn" class="save-btn">Save</button>
-<button id="loadBtn" class="load-btn">Load</button>
 
 <div class="control-box">
 Volume
 <input type="range" id="volume" min="0" max="100" value="50">
-</div>
-
-<div class="control-box">
-BPM
-<input type="number" id="bpm" value="120" min="40" max="300">
 </div>
 
 <div class="control-box">
@@ -232,464 +58,233 @@ Instrument
 <option value="strings">Strings</option>
 </select>
 </div>
-
 </div>
 
-<div id="piano"></div>
-
-<div id="sequencerWrapper">
-<div id="sequencer"></div>
+<div class="piano-wrap">
+  <div class="keys-row">
+    <div class="white-keys" id="whiteKeys">
+      <!-- white keys created by script -->
+    </div>
+    <!-- black keys are positioned absolutely over whites -->
+    <!-- black keys container -->
+    <div id="blackKeysContainer"></div>
+  </div>
 </div>
 
 <div class="info">
-Yellow = note start<br>
-Orange = note length extension<br>
-Click a note start again to remove it
+Tip: press and hold a mapped computer key. The sound lasts 0.6s. Change instrument or volume above.
 </div>
-
 </div>
 
 <script>
-const STEPS = 64;
+/*
+ One octave only: C4 to B4 (white notes: C D E F G A B)
+ White key mapping: A S D F G H J -> C4 D4 E4 F4 G4 A4 B4
+ Black key mapping: W E  T Y U -> C#4 D#4  F#4 G#4 A#4
+ The layout follows a real piano:
+  White order: C  D  E  F  G  A  B
+  Black positions: between C-D (C#), D-E (D#), *no black between E-F*, F-G (F#), G-A (G#), A-B (A#)
+*/
 
-const pianoDiv = document.getElementById("piano");
-const sequencer = document.getElementById("sequencer");
-
-let audioContext;
-let playTimer = null;
-let currentStep = 0;
-
-let dragging = false;
-let dragRow = null;
-let dragStart = null;
-
-const notes = [
-"C3","C#3","D3","D#3","E3","F3","F#3","G3","G#3","A3","A#3","B3",
-"C4","C#4","D4","D#4","E4","F4","F#4","G4","G#4","A4","A#4","B4",
-"C5","C#5","D5","D#5","E5","F5","F#5","G5","G#5","A5","A#5","B5"
+// Notes array (one octave)
+const whiteNotes = ['C4','D4','E4','F4','G4','A4','B4'];
+const blackNotes = [
+  {note:'C#4', positionIndex:0, key:'w'},
+  {note:'D#4', positionIndex:1, key:'e'},
+  // skip between E-F (no black)
+  {note:'F#4', positionIndex:3, key:'t'},
+  {note:'G#4', positionIndex:4, key:'y'},
+  {note:'A#4', positionIndex:5, key:'u'}
 ];
 
+// Keyboard mapping
+const keyMap = {
+  // white keys
+  'a':'C4','s':'D4','d':'E4','f':'F4','g':'G4','h':'A4','j':'B4',
+  // black keys
+  'w':'C#4','e':'D#4','t':'F#4','y':'G#4','u':'A#4'
+};
+
+const audioContext = (window.AudioContext || window.webkitAudioContext) ? new (window.AudioContext || window.webkitAudioContext)() : null;
 const frequencies = {};
-const noteData = [];
+// build frequencies map (simple calculation using A4 = 440)
+(function buildFreq(){
+  const names = ["C","C#","D","D#","E","F","F#","G","G#","A","A#","B"];
+  for(let octave=0; octave<=8; octave++){
+    for(let i=0;i<12;i++){
+      const name = names[i] + octave;
+      const index = octave*12 + i;
+      const a4Index = 4*12 + 9; // A4 is index
+      frequencies[name] = 440 * Math.pow(2, (index - a4Index)/12);
+    }
+  }
+})();
 
-function createFrequencyMap(){
-
-const names = ["C","C#","D","D#","E","F","F#","G","G#","A","A#","B"];
-
-for(let octave=0; octave<=8; octave++){
-
-for(let i=0;i<12;i++){
-
-const index=(octave*12)+i;
-const a4=(4*12)+9;
-
-frequencies[names[i]+octave]=
-440*Math.pow(2,(index-a4)/12);
-
+function createOsc(type,freq,gainNode){
+  const osc = audioContext.createOscillator();
+  osc.type = type;
+  osc.frequency.value = freq;
+  osc.connect(gainNode);
+  osc.start();
+  return osc;
 }
 
+function playSound(note, duration = 0.6){
+  if(!audioContext) return;
+  const instrument = document.getElementById('instrument').value;
+  const gainNode = audioContext.createGain();
+  const vol = document.getElementById('volume').value;
+  gainNode.gain.value = vol/100;
+  gainNode.connect(audioContext.destination);
+
+  const list = [];
+  const freq = frequencies[note] || 440;
+  if(instrument === 'piano'){
+    list.push(createOsc('sine', freq, gainNode));
+  } else if(instrument === 'electric'){
+    list.push(createOsc('triangle', freq, gainNode));
+  } else if(instrument === 'organ'){
+    list.push(createOsc('square', freq, gainNode));
+    list.push(createOsc('square', freq*2, gainNode));
+  } else if(instrument === 'strings'){
+    list.push(createOsc('sawtooth', freq, gainNode));
+    list.push(createOsc('triangle', freq/2, gainNode));
+  }
+
+  // simple decay
+  gainNode.gain.exponentialRampToValueAtTime(0.0001, audioContext.currentTime + duration);
+
+  list.forEach(osc => osc.stop(audioContext.currentTime + duration));
 }
 
-}
+// Build visual keys
+const whiteKeysDiv = document.getElementById('whiteKeys');
+const blackKeysContainer = document.getElementById('blackKeysContainer');
+const whiteKeyElements = [];
+const blackKeyElements = [];
 
-createFrequencyMap();
-
-notes.forEach(()=>{
-noteData.push([]);
+whiteNotes.forEach((note, i) => {
+  const w = document.createElement('div');
+  w.className = 'key white';
+  w.dataset.note = note;
+  w.style.width = '80px';
+  w.style.height = '240px';
+  w.style.borderRadius = '6px';
+  // label
+  const label = document.createElement('div');
+  label.className = 'key-label';
+  label.textContent = note + ' (' + Object.keys(keyMap).find(k=>keyMap[k]===note)?.toUpperCase() + ')';
+  w.appendChild(label);
+  // click
+  w.addEventListener('mousedown', () => {
+    playSound(note, 0.6);
+    w.classList.add('active');
+    setTimeout(()=>w.classList.remove('active'), 200);
+  });
+  whiteKeysDiv.appendChild(w);
+  whiteKeyElements.push(w);
 });
 
-function initAudio(){
-
-if(!audioContext){
-
-audioContext =
-new(window.AudioContext || window.webkitAudioContext)();
-
-}
-
-}
-
-function createOsc(type,freq,gain){
-
-const osc = audioContext.createOscillator();
-
-osc.type = type;
-osc.frequency.value = freq;
-
-osc.connect(gain);
-osc.start();
-
-return osc;
-}
-
-function playSound(note,duration,when=0){
-
-initAudio();
-
-const instrument =
-document.getElementById("instrument").value;
-
-const gain = audioContext.createGain();
-gain.gain.value =
-document.getElementById("volume").value/100;
-
-gain.connect(audioContext.destination);
-
-const list=[];
-
-if(instrument==="piano"){
-list.push(createOsc("sine",frequencies[note],gain));
-}
-
-if(instrument==="electric"){
-list.push(createOsc("triangle",frequencies[note],gain));
-}
-
-if(instrument==="organ"){
-list.push(createOsc("square",frequencies[note],gain));
-list.push(createOsc("square",frequencies[note]*2,gain));
-}
-
-if(instrument==="strings"){
-list.push(createOsc("sawtooth",frequencies[note],gain));
-list.push(createOsc("triangle",frequencies[note]/2,gain));
-}
-
-gain.gain.exponentialRampToValueAtTime(
-0.0001,
-(audioContext.currentTime + when) + duration
-);
-
-list.forEach(osc=>{
-osc.stop((audioContext.currentTime + when) + duration);
-});
-
-}
-
-function buildPiano(){
-
-// create visual keys in order from C3 up
-notes.forEach(note=>{
-
-const key=document.createElement("div");
-
-key.className =
-"key " + (note.includes("#") ? "black":"white");
-
-key.textContent=note;
-
-key.dataset.note = note;
-
-key.onclick=()=>{
-
-playSound(note,0.5);
-
-key.classList.add("active");
-
-setTimeout(()=>{
-key.classList.remove("active");
-},100);
-
-};
-
-pianoDiv.appendChild(key);
-
-});
-
-}
-
-buildPiano();
-
-function renderSequencer(){
-
-sequencer.innerHTML="";
-
-sequencer.style.gridTemplateColumns =
-"90px repeat("+STEPS+", 28px)";
-
-for(let row=0;row<notes.length;row++){
-
-const label=document.createElement("div");
-label.className="noteLabel";
-label.textContent=notes[row];
-sequencer.appendChild(label);
-
-for(let col=0;col<STEPS;col++){
-
-const cell=document.createElement("div");
-
-cell.className="cell";
-
-if((col+1)%4===0){
-cell.classList.add("measure");
-}
-
-cell.dataset.row=row;
-cell.dataset.col=col;
-
-const note = noteData[row].find(n=>{
-return col >= n.start && col < n.start+n.length;
-});
-
-if(note){
-
-if(col===note.start){
-cell.classList.add("noteStart");
-}else{
-cell.classList.add("noteBody");
-}
-
-}
-
-cell.addEventListener("mousedown",()=>{
-
-dragging=true;
-dragRow=row;
-dragStart=col;
-
-const existing =
-noteData[row].find(n=>n.start===col);
-
-if(existing){
-
-noteData[row] =
-noteData[row].filter(n=>n!==existing);
-
-renderSequencer();
-return;
-}
-
-noteData[row].push({
-start:col,
-length:1
-});
-
-renderSequencer();
-
-});
-
-cell.addEventListener("mouseenter",()=>{
-
-if(!dragging) return;
-if(row!==dragRow) return;
-
-const note =
-noteData[row].find(n=>n.start===dragStart);
-
-if(!note) return;
-
-note.length =
-Math.max(1,(col-dragStart)+1);
-
-renderSequencer();
-
-});
-
-sequencer.appendChild(cell);
-
-}
-
-}
-
-}
-
-document.addEventListener("mouseup",()=>{
-
-dragging=false;
-dragRow=null;
-dragStart=null;
-
-});
-
-renderSequencer();
-
-function clearPlayhead(){
-
-document.querySelectorAll(".playhead")
-.forEach(cell=>{
-cell.classList.remove("playhead");
-});
-
-}
-
-function stopSong(){
-
-clearInterval(playTimer);
-playTimer=null;
-currentStep=0;
-clearPlayhead();
-
-}
-
-function playSong(){
-
-stopSong();
-
-const bpm =
-parseInt(document.getElementById("bpm").value);
-
-const stepTime =
-(60000/bpm)/4;
-
-playTimer=setInterval(()=>{
-
-clearPlayhead();
-
-const cells =
-document.querySelectorAll(".cell");
-
-for(let row=0;row<notes.length;row++){
-
-const visualIndex =
-(row*STEPS)+currentStep;
-
-if(cells[visualIndex]){
-cells[visualIndex].classList.add("playhead");
-}
-
-for(const note of noteData[row]){
-
-if(note.start===currentStep){
-
-playSound(
-notes[row],
-(note.length*stepTime)/1000
-);
-
-}
-
-}
-
-}
-
-currentStep++;
-
-if(currentStep>=STEPS){
-currentStep=0;
-}
-
-},stepTime);
-
-}
-
-document.getElementById("playBtn")
-.addEventListener("click",playSong);
-
-document.getElementById("stopBtn")
-.addEventListener("click",stopSong);
-
-document.getElementById("clearBtn")
-.addEventListener("click",()=>{
-
-stopSong();
-
-for(let i=0;i<noteData.length;i++){
-noteData[i]=[];
-}
-
-renderSequencer();
-
-});
-
-document.getElementById("saveBtn")
-.addEventListener("click",()=>{
-
-localStorage.setItem(
-"advancedPianoSong",
-JSON.stringify(noteData)
-);
-
-alert("Song Saved");
-
-});
-
-document.getElementById("loadBtn")
-.addEventListener("click",()=>{
-
-const data =
-localStorage.getItem("advancedPianoSong");
-
-if(!data){
-alert("No saved song");
-return;
-}
-
-const parsed =
-JSON.parse(data);
-
-for(let i=0;i<notes.length;i++){
-
-noteData[i] =
-parsed[i] || [];
-
-}
-
-renderSequencer();
-
-alert("Song Loaded");
-
-});
-
-// --- Keyboard mapping and handling ---
-
-// Map computer keys to notes. This is a simple layout.
-// Lower row: Z X C V B N M => C3 D3 E3 F3 G3 A3 B3 (white)
-// Above them: S D   G H J => C#3 D#3    F#3 G#3 A#3 (black)
-// Top row: Q W E R T Y U => C4 D4 E4 F4 G4 A4 B4
-// Numbers 2 3 5 6 7 9 => C#4 D#4 F#4 G#4 A#4 (black in top row)
-const keyToNote = {
-  // octave 3
-  'z':'C3','s':'C#3','x':'D3','d':'D#3','c':'E3','v':'F3','g':'F#3','b':'G3','h':'G#3','n':'A3','j':'A#3','m':'B3',
-  // octave 4
-  'q':'C4','2':'C#4','w':'D4','3':'D#4','e':'E4','r':'F4','5':'F#4','t':'G4','6':'G#4','y':'A4','7':'A#4','u':'B4',
-  // octave 5 (optional)
-  'i':'C5','9':'C#5','o':'D5','0':'D#5','p':'E5'
-};
-
-// Keep track of which keys are down to avoid repeats
+// Position black keys absolutely over the white keys
+// Calculate left positions relative to white keys
+// Each white key is 80px wide + 2px gap (we used flex gap earlier). For simplicity use left offsets.
+(function placeBlackKeys(){
+  // container left offset is same as whiteKeysDiv start; we will compute positions using child bounding boxes
+  // After layout, use bounding boxes to place black keys
+  requestAnimationFrame(()=>{
+    const whites = whiteKeyElements.map(el => el.getBoundingClientRect());
+    const parentRect = whiteKeysDiv.getBoundingClientRect();
+    blackNotes.forEach(b => {
+      // positionIndex refers to between white keys: 0 means between white[0] and white[1]
+      const idx = b.positionIndex;
+      // compute mid point between white key idx and idx+1
+      const leftWhite = whites[idx];
+      const rightWhite = whites[idx+1];
+      // some environments might not have rightWhite (be safe)
+      const mid = rightWhite ? ((leftWhite.left + rightWhite.left) / 2) : (leftWhite.left + leftWhite.width * 0.75);
+      // convert to container relative left
+      const left = mid - parentRect.left;
+      const bk = document.createElement('div');
+      bk.className = 'key black';
+      bk.dataset.note = b.note;
+      bk.style.left = (left - 26) + 'px'; // center black key (width 52)
+      bk.style.top = '10px';
+      bk.textContent = b.note + ' (' + b.key.toUpperCase() + ')';
+      bk.style.display = 'flex';
+      bk.style.justifyContent = 'center';
+      bk.style.alignItems = 'flex-end';
+      bk.style.paddingBottom = '10px';
+      bk.style.fontSize = '11px';
+      bk.addEventListener('mousedown', () => {
+        playSound(b.note, 0.6);
+        bk.classList.add('active');
+        setTimeout(()=>bk.classList.remove('active'), 200);
+      });
+      blackKeysContainer.appendChild(bk);
+      blackKeyElements.push(bk);
+    });
+  });
+})();
+
+// Keyboard input handling
 const keysDown = {};
-
-// Find visual key element by note
-function findKeyElement(note){
-  return document.querySelector('.key[data-note="'+note+'"]');
-}
-
-function handleKeyDown(ev){
+window.addEventListener('keydown', (ev) => {
   const k = ev.key.toLowerCase();
-  if(!keyToNote[k]) return;
+  if(!keyMap[k]) return;
   if(keysDown[k]) return; // already pressed
   keysDown[k] = true;
-
-  const note = keyToNote[k];
-  const keyEl = findKeyElement(note);
-  if(keyEl){
-    keyEl.classList.add('active');
-  }
-  // Play short sound (0.5s)
-  playSound(note,0.5);
-}
-
-function handleKeyUp(ev){
+  const note = keyMap[k];
+  playSound(note, 0.6);
+  // add visual active class to corresponding key element
+  const white = document.querySelector('.key.white[data-note="'+note+'"]');
+  const black = document.querySelector('.key.black[data-note="'+note+'"]');
+  if(white) white.classList.add('active');
+  if(black) black.classList.add('active');
+});
+window.addEventListener('keyup', (ev) => {
   const k = ev.key.toLowerCase();
-  if(!keyToNote[k]) return;
+  if(!keyMap[k]) return;
   keysDown[k] = false;
-  const note = keyToNote[k];
-  const keyEl = findKeyElement(note);
-  if(keyEl){
-    keyEl.classList.remove('active');
-  }
-}
+  const note = keyMap[k];
+  const white = document.querySelector('.key.white[data-note="'+note+'"]');
+  const black = document.querySelector('.key.black[data-note="'+note+'"]');
+  if(white) white.classList.remove('active');
+  if(black) black.classList.remove('active');
+});
 
-window.addEventListener('keydown', handleKeyDown);
-window.addEventListener('keyup', handleKeyUp);
-
-// Prevent page scroll when space used for keys sometimes
+// Prevent page scroll for space/arrow keys if used (safe)
 window.addEventListener('keydown', function(e){
   if([' ','ArrowUp','ArrowDown','ArrowLeft','ArrowRight'].includes(e.key)){
     e.preventDefault();
   }
 });
-</script>
 
+// Small play/stop behavior: play a simple scale as demo
+let demoTimer = null;
+document.getElementById('playBtn').addEventListener('click', ()=>{
+  clearInterval(demoTimer);
+  const order = ['C4','D4','E4','F4','G4','A4','B4','C4'];
+  let i = 0;
+  demoTimer = setInterval(()=>{
+    playSound(order[i%order.length], 0.5);
+    // visual flash
+    const el = document.querySelector('.key[data-note="'+order[i%order.length]+'"]');
+    if(el){
+      el.classList.add('active');
+      setTimeout(()=>el.classList.remove('active'),200);
+    }
+    i++;
+  }, 400);
+});
+document.getElementById('stopBtn').addEventListener('click', ()=>{
+  clearInterval(demoTimer);
+  demoTimer = null;
+});
+document.getElementById('clearBtn').addEventListener('click', ()=>{
+  // no sequencer here; just stop demo
+  clearInterval(demoTimer);
+  demoTimer = null;
+});
+</script>
 </body>
 </html>
